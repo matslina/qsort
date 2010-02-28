@@ -1,5 +1,4 @@
-/* Non-obfuscated brainfuck interpreter.
- * Runs the brainfuck source code in CODE.
+/* Conditional expressions instead of if statements in jump().
  */
 
 #include <stdio.h>
@@ -11,17 +10,10 @@ char CODE[] = "++[->+++++<]++++++++[->>++++++++<<]>>....<....>..<.[-]>[-]";
 
 
 /* finds matching loop instruction in either direction */
-int jump(int ip, int direction) {
-  int depth = 0;
-
-  do {
-    if (CODE[ip] == '[')
-      depth += 1;
-    else if (CODE[ip] == ']')
-      depth -= 1;
-    ip += direction;
-  } while( depth );
-  return ip;
+int jump(int ip, int direction, int depth) {
+  depth += CODE[ip] == ']' ? -1 : CODE[ip] == '[';
+  ip += direction;
+  return depth ? jump(ip, direction, depth) : ip;
 }
 
 int main() {
@@ -53,11 +45,11 @@ int main() {
       break;
     case '[': /* jump forward to matching ']' if current cell is zero */
       if (mem[p] == 0)
-	ip = jump(ip, 1);
+	ip = jump(ip, 1, 0);
       break;
     case ']': /* jump back to matching '[' if current cell is non-zero */
       if (mem[p] != 0)
-	ip = jump(ip, -1);
+	ip = jump(ip, -1, 0);
       break;
     }
     ip += 1;

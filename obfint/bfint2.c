@@ -1,5 +1,4 @@
-/* Non-obfuscated brainfuck interpreter.
- * Runs the brainfuck source code in CODE.
+/* Recursion instead of iteration in jump().
  */
 
 #include <stdio.h>
@@ -11,16 +10,14 @@ char CODE[] = "++[->+++++<]++++++++[->>++++++++<<]>>....<....>..<.[-]>[-]";
 
 
 /* finds matching loop instruction in either direction */
-int jump(int ip, int direction) {
-  int depth = 0;
-
-  do {
-    if (CODE[ip] == '[')
-      depth += 1;
-    else if (CODE[ip] == ']')
-      depth -= 1;
-    ip += direction;
-  } while( depth );
+int jump(int ip, int direction, int depth) {
+  if (CODE[ip] == '[')
+    depth += 1;
+  else if (CODE[ip] == ']')
+    depth -= 1;
+  ip += direction;
+  if (depth)
+    return jump(ip, direction, depth);
   return ip;
 }
 
@@ -53,11 +50,11 @@ int main() {
       break;
     case '[': /* jump forward to matching ']' if current cell is zero */
       if (mem[p] == 0)
-	ip = jump(ip, 1);
+	ip = jump(ip, 1, 0);
       break;
     case ']': /* jump back to matching '[' if current cell is non-zero */
       if (mem[p] != 0)
-	ip = jump(ip, -1);
+	ip = jump(ip, -1, 0);
       break;
     }
     ip += 1;
