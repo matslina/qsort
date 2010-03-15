@@ -6,6 +6,8 @@
 #include <string.h>
 
 #define MEMORY_SIZE 65535
+#define DIR_LEFT (-1)
+#define DIR_RIGHT 1
 
 char CODE[] = "++[->+++++<]++++++++[->>++++++++<<]>>....<....>..<.[-]>[-]";
 
@@ -53,11 +55,11 @@ int main() {
       break;
     case '[': /* jump forward to matching ']' if current cell is zero */
       if (mem[p] == 0)
-	ip = jump(ip, 1);
+	ip = jump(ip, DIR_RIGHT);
       break;
     case ']': /* jump back to matching '[' if current cell is non-zero */
       if (mem[p] != 0)
-	ip = jump(ip, -1);
+	ip = jump(ip, DIR_LEFT);
       break;
     }
     ip += 1;
