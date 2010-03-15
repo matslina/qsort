@@ -1,19 +1,24 @@
+/* Non-obfuscated brainfuck interpreter.
+ * Runs the brainfuck source code in CODE.
+ */
+
 #include <stdio.h>
 #include <string.h>
 
 #define MEMORY_SIZE 65535
 
-char code[] = "++[->+++++<]++++++++[->>++++++++<<]>>....<....>..<.[-]>[-]";
+char CODE[] = "++[->+++++<]++++++++[->>++++++++<<]>>....<....>..<.[-]>[-]";
 
+
+/* finds matching loop instruction in either direction */
 int jump(int ip, int direction) {
   int depth = 0;
 
   do {
-    if (code[ip] == '[')
+    if (CODE[ip] == '[')
       depth += 1;
-    else if (code[ip] == ']')
+    else if (CODE[ip] == ']')
       depth -= 1;
-
     ip += direction;
   } while( depth );
   return ip;
@@ -26,37 +31,36 @@ int main() {
   ip = p = 0;
   memset(mem, 0, MEMORY_SIZE);
 
-  while( ip < sizeof(code) ) {
-    switch( code[ip] ) {
-    case '+':
+  while( ip < sizeof(CODE) ) {
+    switch( CODE[ip] ) {
+    case '+': /* increase current cell */
       mem[p] += 1;
       break;
-    case '-':
+    case '-': /* decrease current cell */
       mem[p] -= 1;
       break;
-    case '>':
+    case '>': /* move pointer up */
       p += 1;
       break;
-    case '<':
+    case '<': /* move pointer down */
       p -= 1;
       break;
-    case '.':
+    case '.': /* output current cell to stdout */
       putchar(mem[p]);
       break;
-    case ',':
+    case ',': /* read one byte into current cell from stdin*/
       mem[p] = getchar();
       break;
-    case '[':
-      if(mem[p] == 0)
+    case '[': /* jump forward to matching ']' if current cell is zero */
+      if (mem[p] == 0)
 	ip = jump(ip, 1);
       break;
-    case ']':
-      if(mem[p] != 0)
+    case ']': /* jump back to matching '[' if current cell is non-zero */
+      if (mem[p] != 0)
 	ip = jump(ip, -1);
       break;
     }
     ip += 1;
   }
-
   return 0;
 }
