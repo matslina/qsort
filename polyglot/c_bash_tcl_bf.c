@@ -8,7 +8,7 @@
 #\
 echo "Hello bash world!"
 #\
-cat > /dev/null << EOF_
+cat > /dev/null << OOOOOOO
 puts "Hello tcl world!"
 exit
 #endif
