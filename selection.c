@@ -94,7 +94,22 @@ int quickselect(int *list, int n, int k) {
 }
 
 
+int cmp_int(const void *a, const void *b) {
+  return *(int *)a - *(int *)b;
+}
+
+
+/* Selection by sorting.
+ * O(n log n)
+ */
+int sortselect(int *list, int n, int k) {
+  qsort(list, n, sizeof(int), cmp_int);
+  return list[k-1];
+}
+
+
 alg_t algs[] = {{.name="naive", .f=naive},
+		{.name="sortselect", .f=sortselect},
 		{.name="quickselect", .f=quickselect}};
 int nalgs = sizeof(algs) / sizeof(alg_t);
 
