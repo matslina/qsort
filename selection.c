@@ -1,6 +1,6 @@
 /* The selection problem.
  *
- * Given list[0...n-1], find the k smallest elements.
+ * Given list[0...n-1], find the k smallest element.
  */
 
 #include <stdio.h>
@@ -11,7 +11,7 @@
 
 
 typedef struct algorithm {
-  void (*f)(int*, int, int, int*);
+  int (*f)(int*, int, int);
   char *name;
 } alg_t;
 
@@ -19,30 +19,24 @@ typedef struct algorithm {
 /* Naive algorithm.
  * O(n*k)
  */
-void naive(int *list, int n, int k, int *out) {
-  int oi, i;
-
-  int last, lasti;
-  int min, mini;
+int naive(int *list, int n, int k) {
+  int i, last, lasti, min, mini;
 
   last = -1;
-
-  for (oi=0; oi<k; oi++) {
-
-    for (i=1, mini=0, min=list[0]; i<n; i++) {
-      if(list[i] < min && (list[i] > last ||
-			   (list[i] == last && lasti < i))) {
-	min = list[i];
+  while (k--) {
+    mini = 0;
+    min = list[mini];
+    for (i=1; i<n; i++) {
+      if (list[i] < min && (list[i] > last ||
+			    (list[i] == last && lasti < i))) {
 	mini = i;
+	min = list[i];
       }
     }
-    out[oi] = mini;
     lasti = mini;
     last = min;
   }
-
-  for (i=0; i<k; i++)
-    out[i] = list[out[i]];
+  return last;
 }
 
 
@@ -78,8 +72,8 @@ int partition(int *A, int left, int right, int pivot) {
 /* Quickselect.
  * O(n^2) (avg O(n))
  */
-void quickselect(int *list, int n, int k, int *out) {
-  int i, left, right, pivot, target;
+int quickselect(int *list, int n, int k) {
+  int left, right, pivot, target;
 
   target = k - 1;
   left = 0;
@@ -96,13 +90,7 @@ void quickselect(int *list, int n, int k, int *out) {
       right = pivot - 1;
   }
 
-  for (i=0; i<k; i++)
-    out[i] = list[i];
-}
-
-
-int cmp_int(const void *a, const void *b) {
-  return *(int *)a - *(int *)b;
+  return list[k-1];
 }
 
 
@@ -113,8 +101,8 @@ int nalgs = sizeof(algs) / sizeof(alg_t);
 
 int main(int argc, char **argv) {
   int n, k, i, alg_i;
-  int *list, *orig, **min;
-  clock_t start;
+  int *list, *orig, *result;
+  clock_t time_start, time_stop;
   alg_t alg;
 
   n = k = -1;
@@ -129,27 +117,27 @@ int main(int argc, char **argv) {
 
   orig = malloc(n * sizeof(int));
   list = malloc(n * sizeof(int));
-  min = malloc(k * sizeof(int *));
+  result = malloc(nalgs * sizeof(int));
 
   for (i=0; i<n; i++)
     orig[i] = (int)(random() % n);
 
   for (alg_i=0; alg_i<nalgs; alg_i++) {
     alg = algs[alg_i];
-    min[alg_i] = malloc(k * sizeof(int));
     memcpy(list, orig, n * sizeof(int));
 
-    start = clock();
-    alg.f(list, n, k, min[alg_i]);
-    printf("%s: %.2f\n", alg.name, ((double)(clock() - start))/CLOCKS_PER_SEC);
+    time_start = clock();
+    result[alg_i] = alg.f(list, n, k);
+    time_stop = clock();
 
-    qsort(min[alg_i], k, sizeof(int), &cmp_int);
+    printf("%s: %.2f\n", alg.name,
+	   ((double)(time_stop - time_start))/CLOCKS_PER_SEC);
   }
 
   for (alg_i=1; alg_i<nalgs; alg_i++)
-    if (memcmp(min[alg_i], min[alg_i-1], k)) {
-      fprintf(stderr,"mismatch between %s and %s\n",
-	      algs[alg_i].name, algs[alg_i-1].name);
+    if (result[alg_i] != result[alg_i-1]) {
+      fprintf(stderr,"mismatch between %s (%d) and %s (%d)\n",
+	      algs[alg_i].name, result[alg_i], algs[alg_i-1].name, result[alg_i-1]);
       return 1;
     }
 
