@@ -24,15 +24,16 @@ int naive(int *list, int n, int k) {
 
   last = -1;
   while (k--) {
-    mini = 0;
+    for (mini=0; mini<n; mini++)
+      if (list[mini] > last || (list[mini] == last && lasti < mini))
+	break;
     min = list[mini];
-    for (i=1; i<n; i++) {
+    for (i=mini; i<n; i++)
       if (list[i] < min && (list[i] > last ||
 			    (list[i] == last && lasti < i))) {
 	mini = i;
 	min = list[i];
       }
-    }
     lasti = mini;
     last = min;
   }
