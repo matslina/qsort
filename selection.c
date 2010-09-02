@@ -1,6 +1,6 @@
 /* The selection problem.
  *
- * Given list[0...n-1], find the k smallest element.
+ * Given list[0...n-1], find the kth smallest element.
  */
 
 #include <stdio.h>
