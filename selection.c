@@ -109,9 +109,52 @@ int sortselect(int *list, int n, int k) {
 }
 
 
+/* The median-of-medians algorithm.
+ * O(n)
+ */
+int medianofmedians(int *list, int n, int k) {
+  int i, mm, mmi, pivot, target;
+  int *medians;
+
+  medians = malloc((n/5)*sizeof(int));
+
+  target = k - 1;
+
+  while (n >= 5) {
+
+    for (i=0; i<n/5; i++) {
+      qsort(list + i*5, 5, sizeof(int), cmp_int);
+      medians[i] = list[i*5+2];
+    }
+
+    mm = medianofmedians(medians, n/5, (n/5)/2+1);
+    for (mmi=2; list[mmi]!=mm; mmi+=5);
+
+    pivot = partition(list, 0, n-1, mmi);
+
+    if (pivot == target) {
+      free(medians);
+      return list[pivot];
+    }
+    else if (pivot < target) {
+      list += pivot + 1;
+      n -= pivot + 1;
+      target -= pivot + 1;
+    }
+    else if (pivot > target)
+      n = pivot;
+  }
+
+  free(medians);
+  qsort(list, n, sizeof(int), cmp_int);
+  return list[target];
+}
+
+
 alg_t algs[] = {{.name="naive", .f=naive},
 		{.name="sortselect", .f=sortselect},
-		{.name="quickselect", .f=quickselect}};
+		{.name="quickselect", .f=quickselect},
+		{.name="medianofmedians", .f=medianofmedians}};
 int nalgs = sizeof(algs) / sizeof(alg_t);
 
 
