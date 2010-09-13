@@ -35,5 +35,6 @@ bt_node_t *bt_next(bt_node_t *x);
 bt_node_t *bt_prev(bt_node_t *x);
 void bt_del(bt_node_t *x);
 void bt_stat(bt_node_t *T, bt_stat_t *stat);
+void bt_walk_bf(bt_node_t *T, int (*f)(bt_node_t *, int));
 
 #endif

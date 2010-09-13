@@ -150,3 +150,59 @@ void bt_stat(bt_node_t *T, bt_stat_t *stat) {
   memset((void *)stat, 0, sizeof(bt_stat_t));
  _bt_stat_rec(T, stat, 0);
 }
+
+struct _bt_walk_bf_level_s {
+  bt_node_t **p;
+  int size;
+  int count;
+};
+
+/* Traverses tree breadth first.
+ * Invokes f(node, depth) on every node.
+ * Stops if f returns non-zero.
+ */
+void bt_walk_bf(bt_node_t *T, int (*f)(bt_node_t *, int)) {
+  struct _bt_walk_bf_level_s a, b;
+  struct _bt_walk_bf_level_s *curr, *next, *swap;
+  bt_node_t *x;
+  int i, depth;
+
+  curr = &a;
+  next = &b;
+
+  curr->size = 1; /* any size > 0 will do*/
+  curr->p = malloc(curr->size * sizeof(bt_node_t *));
+  curr->count = 1;
+  curr->p[0] = T;
+
+  next->size = -1;
+  next->p = NULL;
+
+  depth = 0;
+  while (curr->count) {
+
+    if (next->size < 2 * curr->count) {
+      next->size = 2 * curr->count;
+      if(next->p) free(next->p);
+      next->p = malloc(next->size * sizeof(bt_node_t *));
+    }
+
+    next->count = 0;
+    for (i=0; i<curr->count; i++) {
+      x = curr->p[i];
+      if (x->left)
+	next->p[next->count++] = x->left;
+      if (x->right)
+	next->p[next->count++] = x->right;
+
+      if (f(x, depth))
+	break;
+    }
+
+    swap = curr; curr = next; next = swap;
+    depth++;
+  }
+
+  if (curr->p) free(curr->p);
+  if (next->p) free(next->p);
+}
