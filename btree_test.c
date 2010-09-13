@@ -35,6 +35,13 @@ int main(int argc, char *argv[]) {
   printf("insert %d: %.2f\n", n,
 	 ((double)(time_stop - time_start))/CLOCKS_PER_SEC);
 
+  /* check */
+  bt_stat(T, &stat);
+  if (stat.broken_node) {
+    printf("tree broken at key %d (depth %d): %s\n", stat.broken_node->key, stat.broken_depth, stat.broken_msg);
+    return 1;
+  }
+
   /* search */
   time_start = clock();
   for (i=0; i<n; i++) {
