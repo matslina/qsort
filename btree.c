@@ -1,4 +1,5 @@
-#include <stdlib.h>
+#include <string.h> /* memset */
+#include <stdlib.h> /* calloc, free */
 #include "btree.h"
 
 /* Creates a new tree with (key,value) as root.
@@ -100,4 +101,52 @@ bt_node_t *bt_prev(bt_node_t *x) {
  */
 void bt_del(bt_node_t *x) {
   /* TODO */
+}
+
+int _bt_stat_rec(bt_node_t *T, bt_stat_t *stat, int depth) {
+
+  if (T->left) {
+    if (T->left->key >= T->key)
+      stat->broken_msg = "left child key too large";
+    if (T->left->parent != T)
+      stat->broken_msg = "left child has wrong parent";
+  }
+
+  if (T->right) {
+    if (T->right->key <= T->key)
+      stat->broken_msg = "right child key too small";
+    if (T->right->parent != T)
+      stat->broken_msg = "right child has wrong parent";
+  }
+
+  if (stat->broken_msg) {
+    stat->broken_node = T;
+    stat->broken_depth = depth;
+    return 1;
+  }
+
+  stat->num_nodes += 1;
+
+  if (!T->left && !T->right) {
+    stat->num_leaves += 1;
+    stat->max_depth = depth > stat->max_depth ? depth : stat->max_depth;
+    stat->min_depth = depth < stat->min_depth ? depth : stat->min_depth;
+  }
+
+  if (T->left)
+    if (_bt_stat_rec(T->left, stat, depth + 1))
+      return 1;
+
+  if (T->right)
+    if (_bt_stat_rec(T->right, stat, depth + 1))
+      return 1;
+
+  return 0;
+}
+
+/* Builds stats for a tree.
+ */
+void bt_stat(bt_node_t *T, bt_stat_t *stat) {
+  memset((void *)stat, 0, sizeof(bt_stat_t));
+ _bt_stat_rec(T, stat, 0);
 }
