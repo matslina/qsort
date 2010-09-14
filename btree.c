@@ -97,10 +97,59 @@ bt_node_t *bt_prev(bt_node_t *x) {
   return x->parent;
 }
 
-/* Deletes node from tree.
+/* "Splices out" x, i.e. replaces it with it's child.
+ * x must have < 2 children.
  */
-void bt_del(bt_node_t *x) {
-  /* TODO */
+bt_node_t *_bt_splice(bt_node_t *x) {
+  bt_node_t *child;
+
+  child = x->right ? x->right : x->left;
+  if (x->parent) {
+    if (x->parent->left == x)
+      x->parent->left = child;
+    else
+      x->parent->right = child;
+  }
+  if (child)
+    child->parent = x->parent;
+
+  return child;
+}
+
+
+/* Deletes node from tree.
+ * Returns the node that takes the deleted nodes place, if any.
+ * Note: if deleting the root node, the returned node (if any) is the new root.
+ */
+bt_node_t *bt_del(bt_node_t *x) {
+  bt_node_t *y;
+
+  if (!x->left || !x->right) {
+    y = _bt_splice(x);
+    free(x);
+    return y;
+  }
+
+  y = bt_next(x);
+  _bt_splice(y);
+
+  if (x->parent) {
+    if (x->parent->left == x)
+      x->parent->left = y;
+    else
+      x->parent->right = y;
+  }
+
+  if (x->left)
+    x->left->parent = y;
+  if (x->right)
+    x->right->parent = y;
+
+  y->parent = x->parent;
+  y->left = x->left;
+  y->right = x->right;
+  free(x);
+  return y;
 }
 
 int _bt_stat_rec(bt_node_t *T, bt_stat_t *stat, int depth) {

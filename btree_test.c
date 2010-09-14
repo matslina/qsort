@@ -18,6 +18,43 @@ bt_node_t *new(int key, bt_node_t *l, bt_node_t *r) {
   return x;
 }
 
+START_TEST (test_del) {
+  bt_node_t *T, *x;
+
+  T = new(1,
+	  NULL,
+	  new(8,
+	      new(3,
+		  new(2, NULL, NULL),
+		  new(6,
+		      new(4,
+			  NULL,
+			  new(5, NULL, NULL)),
+		      new(7, NULL, NULL))),
+	      NULL));
+
+  /* case 1: node with two children */
+  x = bt_del(T->right->left); /* node with key 3 */
+  fail_unless(T->right->left == x, "replacing node should be returned");
+  fail_unless(x->key == 4, "successor should replace deleted node");
+  fail_unless(x->left->key == 2, "replacement should inherit left child");
+  fail_unless(x->right->key == 6, "replacement should inherit right child");
+  fail_unless(x->right->left->key == 5,
+	      "the replacing nodes single child should be pulled up");
+
+  /* case 2: node with single child */
+  x = bt_del(T->right); /* node with key 8 */
+  fail_unless(T->right == x, "the replacing node should be returned");
+  fail_unless(x->key == 4, "the child should replace");
+
+  /* case 3: node is a leaf */
+  x = bt_del(T->right->left); /* node with key 2 */
+  fail_unless(x == NULL, "nothing replaces a leaf");
+  fail_unless(T->right->left == NULL, "nothing replaces a leaf");
+  fail_unless(T->right->key == 4, "leafs parent remains the same");
+}
+END_TEST
+
 #define LARGE_ENOUGH 2048
 int test_walk_key[LARGE_ENOUGH];
 int test_walk_depth[LARGE_ENOUGH];
@@ -93,6 +130,10 @@ Suite *btree_suite() {
 
   tc = tcase_create ("walk_bf");
   tcase_add_test (tc, test_walk_bf);
+  suite_add_tcase (s, tc);
+
+  tc = tcase_create ("del");
+  tcase_add_test (tc, test_del);
   suite_add_tcase (s, tc);
 
   return s;
