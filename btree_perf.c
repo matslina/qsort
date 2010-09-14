@@ -11,6 +11,7 @@ int main(int argc, char *argv[]) {
   int i, n, count;
   int *A;
   bt_node_t *T, *x;
+  bt_stat_t stat;
   clock_t time_start, time_stop;
 
   n = -1;
@@ -68,6 +69,21 @@ int main(int argc, char *argv[]) {
   }
   time_stop = clock();
   printf("traverse %d: %.2f\n", count,
+	 ((double)(time_stop - time_start))/CLOCKS_PER_SEC);
+
+  /* delete */
+  time_start = clock();
+  for (i=0, count=0; i<n; count++) {
+    x = bt_get(T, A[i]);
+    if (x) {
+      x = bt_del(x);
+      if (x && x->parent == NULL)
+	T = x;
+    }
+    for(i=i+1; i<n && A[i]==A[i-1]; i++);
+  }
+  time_stop = clock();
+  printf("delete %d: %.2f\n", count,
 	 ((double)(time_stop - time_start))/CLOCKS_PER_SEC);
 
   return 0;
