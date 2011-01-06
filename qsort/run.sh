@@ -14,3 +14,5 @@ for qsort_o in qsort_*.o; do
     ./cmp
     echo
 done
+
+rm cmp
