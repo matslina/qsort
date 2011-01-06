@@ -12,7 +12,7 @@ import PIL.ImageEnhance as ImageEnhance
 import sys
 
 
-def nightvision(orig, brightness, lines, colour):
+def nightvision(orig, brightness, lines, colour, alpha):
 
     line_colour = (colour[0] + 30,
                    colour[1] + 30,
@@ -28,7 +28,7 @@ def nightvision(orig, brightness, lines, colour):
     for row in range(0, mask.size[1], mask.size[1]/lines):
         draw.line([(0, row), (mask.size[0], row)], line_colour)
 
-    return Image.blend(im, mask, 0.5)
+    return Image.blend(im, mask, alpha)
 
 
 def main():
@@ -43,6 +43,9 @@ def main():
                       metavar="M", default="33cc00",
                       help=("color (RGB) for the night vision mask "
                             "(default 33cc00)"))
+    parser.add_option("-a", "--alpha",
+                      metavar="A", default=0.5, type="float",
+                      help="ratio between night vision mask and image")
     (options, args) = parser.parse_args()
 
     if len(args) != 1:
@@ -58,7 +61,8 @@ def main():
     im = nightvision(Image.open(args[0]),
                      options.brightness,
                      options.lines,
-                     options.mask)
+                     options.mask,
+                     options.alpha)
     im.save(args[0])
 
 if __name__ == '__main__':
