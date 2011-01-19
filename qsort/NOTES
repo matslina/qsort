@@ -3,3 +3,4 @@
 * OpenBSDs qsort behaves the same as FreeBSDs
 * NetBSD 5.1's qsort behaves the same ad FreeBSDs
 * newlib-1.19.0 behaves like freebsd
+* DragonflyBSD is like FreeBSD
