@@ -52,8 +52,8 @@ for datf in $datfiles; do
     test $datf == $last_datf && echo >> count_$dist.p || echo ', \' \
 	>> count_$dist.p
 done
-echo "pause mouse" >> count_$dist.p
 
+# TODO: plot min values on y2 axis
 # build histogram plot of the min and max values
 rm -f max_$dist.dat min_$dist.dat
 for datf in $datfiles; do
@@ -64,7 +64,7 @@ done
 cat > max_$dist.p <<EOF
 set terminal png
 set output "max_$dist.png"
-set title "sorting $(tail -n 1 $datf | awk '{print $1}') elements"
+set title "sorting $(tail -n 1 $datf | awk '{print $1}') $dist elements"
 set auto x
 set style data histogram
 set style histogram cluster gap 1
@@ -73,7 +73,6 @@ set xtic rotate by -45 scale 0
 set boxwidth 0.9
 set ylabel "comparisons"
 plot 'max_$dist.dat' using 2:xticlabel(1) notitle
-pause mouse
 EOF
 cat max_$dist.p | \
     sed -e "s/rting.*el/rting $(head -n 1 $datf | awk '{print $1}') el/" | \
