@@ -31,10 +31,13 @@ last_datf=$(echo $datfiles | tr ' ' '\n' | tail -n 1)
 
 # build gnuplot script
 cat > count_$dist.p <<EOF
+set terminal png
+set output "count_$dist.png"
 set title "sorting $dist data"
 set xlabel "elements"
 set ylabel "comparisons"
-#set logscale x 2
+set xrange [0:$(tail -n 1 $last_datf | awk '{print $1}')]
+set xtics 1000000
 set key top left
 set key box
 EOF
@@ -59,6 +62,8 @@ for datf in $datfiles; do
     echo $impl $(head -n 1 $datf | awk '{print $2}') >> min_$dist.dat
 done
 cat > max_$dist.p <<EOF
+set terminal png
+set output "max_$dist.png"
 set title "sorting $(tail -n 1 $datf | awk '{print $1}') elements"
 set auto x
 set style data histogram
