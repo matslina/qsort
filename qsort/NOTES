@@ -1,6 +1,9 @@
 * eglibc-2.11 and glibc-2.11 have identical qsort implementations in stdlib/{m,q}sort.c
 * the opensolaris qsort was pulled from: http://src.opensolaris.org/source/xref/onnv/onnv-gate/usr/src/common/util/qsort.c
-* OpenBSDs qsort behaves the same as FreeBSDs
-* NetBSD 5.1's qsort behaves the same ad FreeBSDs
-* newlib-1.19.0 behaves like freebsd
-* DragonflyBSD is like FreeBSD
+* OpenBSD 5.1 qsort behaves the same as FreeBSD 8.1.0
+* NetBSD 5.1.2 qsort behaves the same as FreeBSD 8.1.0
+* NetBSD HEAD/6-beta removes the switch to insertion sort
+* FreeBSD 9.0.0 is as FreeBSD 8.1.0
+* DragonflyBSD 3.0.0 is like FreeBSD 8.1.0
+* newlib-1.20.0 behaves like FreeBSD 8.1.0
+* The Windows XP data was provided by Andoma, Visual Studio 2005
