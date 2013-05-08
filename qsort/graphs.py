@@ -15,6 +15,7 @@ import os
 import os.path
 import re
 import math
+import subprocess
 
 COUNT_TEMPLATE = """
 set terminal png
@@ -67,8 +68,7 @@ def main():
             data[dist][m.group(1)] = dict(map(int, row.strip().split())
                                           for row in open(f) if row.split())
 
-    # verify that we have the same set of implementations for all dist
-    # types
+    # warn if we lack data for some distributions
     inc_impl = set(data['inc'])
     dec_impl = set(data['dec'])
     rnd_impl = set(data['rand'])
@@ -80,7 +80,8 @@ def main():
                          "for: %s\n" % ', '.join(odd_impl))
 
     # order the implemenations by the minimum number of comparisons
-    # performed for the random distribution
+    # performed for the random distribution. ignore implementations
+    # lacking data for the random distribution.
     impls = sorted(data['rand'],
                    key=lambda k: min(data['rand'][k].values()),
                    reverse=True)
@@ -95,7 +96,7 @@ def main():
                 ltpt[impl] = (i + 1, i + 1)
                 impls.append(impl)
 
-    # write the count gnuplot graphs
+    # create the count gnuplot graphs
     for dist in ('inc', 'dec', 'rand'):
         param = {'dist': dist,
                  'distname': {'inc': 'increasing',
@@ -145,7 +146,7 @@ def main():
                            for h in hists)
             open('%s_%s.dat' % (f_name, dist), "w").write(datf)
 
-            # and write the gnuplot script
+            # write the gnuplot script
             distname = {'inc': 'increasing',
                         'dec': 'decreasing',
                         'rand': 'random'}.get(dist, dist),
@@ -156,6 +157,9 @@ def main():
                                        'unit': unit_name}
             open('%s_%s.p' % (f_name, dist), "w").write(gplot)
             print "wrote %s_%s.p" % (f_name, dist)
+
+            # and finally create the png
+            subprocess.call(["gnuplot", "%s_%s.p" % (f_name, dist)])
 
     return 0
 
