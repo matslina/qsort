@@ -1,7 +1,7 @@
 /* Copy of http://plan9.bell-labs.com/sources/plan9/sys/src/libc/port/qsort.c
  * with some mods to make it compile as is.
  *
- * License is the Lucen Public License Version 1.02
+ * License is the Lucent Public License Version 1.02
  * (http://plan9.bell-labs.com/plan9/license.html)
  */
 
