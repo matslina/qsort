@@ -149,7 +149,7 @@ def main():
             # write the gnuplot script
             distname = {'inc': 'increasing',
                         'dec': 'decreasing',
-                        'rand': 'random'}.get(dist, dist),
+                        'rand': 'random'}.get(dist, dist)
             gplot = MINMAX_TEMPLATE % {'minmax': f_name,
                                        'dist': dist,
                                        'elslg': round(math.log(numels, 2)),
