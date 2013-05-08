@@ -3,7 +3,6 @@
  * "The license for the diet libc is the GNU General Public License, version
  *  2 (as included in the file COPYING)."
 */
-
 #include <sys/cdefs.h>
 #include <stdlib.h>
 
@@ -18,6 +17,8 @@ static void exch(char* base,size_t size,size_t a,size_t b) {
   }
 }
 
+#define RAND
+
 /* Quicksort with 3-way partitioning, ala Sedgewick */
 /* Blame him for the scary variable names */
 /* http://www.cs.princeton.edu/~rs/talks/QuicksortIsOptimal.pdf */
@@ -26,6 +27,25 @@ static void quicksort(char* base,size_t size,ssize_t l,ssize_t r,
   ssize_t i=l-1, j=r, p=l-1, q=r, k;
   char* v=base+r*size;
   if (r<=l) return;
+
+#ifdef RAND
+  /*
+     We chose the rightmost element in the array to be sorted as pivot,
+     which is OK if the data is random, but which is horrible if the
+     data is already sorted.  Try to improve by exchanging it with a
+     random other pivot.
+   */
+  exch(base,size,l+(rand()%(r-l)),r);
+#elif defined MID
+  /*
+     We chose the rightmost element in the array to be sorted as pivot,
+     which is OK if the data is random, but which is horrible if the
+     data is already sorted.  Try to improve by chosing the middle
+     element instead.
+   */
+  exch(base,size,l+(r-l)/2,r);
+#endif
+
   for (;;) {
     while (++i != r && compar(base+i*size,v)<0) ;
     while (compar(v,base+(--j)*size)<0) if (j == l) break;
