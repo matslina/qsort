@@ -1,6 +1,7 @@
-/* This is a copy of opensolaris' usr/src/common/util/qsort.c which
- * appears to be used in their libc. Some modifications to make it
- * compileable as is.
+/* This is a copy of illumos qsort.c with some modifications to make
+ * it compileable as is.
+ *
+ * http://src.illumos.org/source/xref/illumos-gate/usr/src/common/util/qsort.c
  */
 
 /*
