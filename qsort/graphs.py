@@ -27,6 +27,7 @@ set xrange [0:%(xrange_upper)s]
 set xtics 1000000
 set key top left
 set key box
+set key spacing 0.9
 plot %(plots)s
 """
 
