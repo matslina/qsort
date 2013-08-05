@@ -1,5 +1,0 @@
-#\
-cat > /dev/null << exit
-puts "Hello world!"
-exit
-echo "Hello world!"
