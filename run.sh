@@ -6,11 +6,13 @@ dist=$1
 test -z "$dist" && dist="rand"
 
 # list implementations
-implementations=$(ls -1 qsort_*.c | perl -pe "s/qsort_(.*)\.c/\1/" | sort)
+implementations=$(ls -1 impls/qsort_*.c |
+                  perl -pe "s/impls\/qsort_(.*)\.c/\1/" |
+		  sort)
 
 # compile
 for impl in $implementations; do
-    gcc -g qsort_$impl.c cmp_count.c -o cmp_$impl
+    gcc -g impls/qsort_$impl.c cmp_count.c -o cmp_$impl
 done
 
 # run
