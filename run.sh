@@ -15,19 +15,16 @@ done
 # run comparison counter
 for dist in inc dec rand; do
     for impl in $implementations; do
-	if [ -e ${dist}_$impl.dat ]; then
+	if [ -e data/${dist}_$impl.dat ]; then
 	    continue
 	fi
 	echo $dist $impl
-	./cmp_${impl} $dist > ${dist}_$impl.dat || \
-            (echo "fail $impl $dist" && rm ${dist}_$impl.dat)
+	./cmp_${impl} $dist > data/${dist}_$impl.dat || \
+            (echo "fail $impl $dist" && rm data/${dist}_$impl.dat)
     done
 done
 
 # graph the comparison count data
-# (mangling the data was a paing in bash. hence python.)
+# (mangling the data was a pain in bash. hence python.)
 python cmp_count_graphs.py
-for f in *.p; do
-    gnuplot $f
-done
 rm *.p

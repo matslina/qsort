@@ -31,7 +31,7 @@ set key spacing 0.9
 plot %(plots)s
 """
 
-COUNT_PLOT_TEMPLATE = ("'%(datfile)s' title \"%(implementation)s\" "
+COUNT_PLOT_TEMPLATE = ("'data/%(datfile)s' title \"%(implementation)s\" "
                        "with linespoints lt %(lt)d pt %(pt)d")
 
 MINMAX_TEMPLATE = """
@@ -47,7 +47,7 @@ set grid y
 set xtic rotate by -45 scale 0
 set boxwidth 0.9
 set ylabel "%(unit)s comparisons"
-plot '%(minmax)s_%(dist)s.dat' using 2:xticlabel(1) notitle
+plot 'data/%(minmax)s_%(dist)s.dat' using 2:xticlabel(1) notitle
 """
 
 
@@ -58,8 +58,9 @@ def main():
     data = {}
     for dist in ('inc', 'dec', 'rand'):
         data[dist] = {}
-        datfile_re = re.compile(r'^%s_(.+)\.dat$' % dist)
-        for f in os.listdir('.'):
+        datfile_re = re.compile(r'^data/%s_(.+)\.dat$' % dist)
+        for f in os.listdir('data'):
+            f = os.path.join('data', f)
             if not os.path.isfile(f):
                 continue
             m = datfile_re.match(f)
@@ -113,7 +114,7 @@ def main():
                                         if impl in data[dist])}
 
         open('count_%s.p' % dist, 'w').write(COUNT_TEMPLATE % param)
-        print "wrote count_%s.p" % dist
+        subprocess.call(["gnuplot", "count_%s.p" % dist])
 
     # histogram the comparisons for the largest and smallest number of
     # elements
@@ -145,7 +146,7 @@ def main():
             # write the .dat file
             datf = ''.join('%s %f\n' % (h[0], h[1] / float(unit))
                            for h in hists)
-            open('%s_%s.dat' % (f_name, dist), "w").write(datf)
+            open('data/%s_%s.dat' % (f_name, dist), "w").write(datf)
 
             # write the gnuplot script
             distname = {'inc': 'increasing',
@@ -157,7 +158,6 @@ def main():
                                        'distname': distname,
                                        'unit': unit_name}
             open('%s_%s.p' % (f_name, dist), "w").write(gplot)
-            print "wrote %s_%s.p" % (f_name, dist)
 
             # and finally create the png
             subprocess.call(["gnuplot", "%s_%s.p" % (f_name, dist)])
