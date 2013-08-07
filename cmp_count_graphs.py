@@ -19,7 +19,7 @@ import subprocess
 
 COUNT_TEMPLATE = """
 set terminal png
-set output "count_%(dist)s.png"
+set output "output/count_%(dist)s.png"
 set title "sorting %(distname)s data"
 set xlabel "elements"
 set ylabel "comparisons"
@@ -36,7 +36,7 @@ COUNT_PLOT_TEMPLATE = ("'data/%(datfile)s' title \"%(implementation)s\" "
 
 MINMAX_TEMPLATE = """
 set terminal png
-set output "%(minmax)s_%(dist)s.png"
+set output "output/%(minmax)s_%(dist)s.png"
 set title "sorting approximately 2^%(elslg)d %(distname)s elements"
 set auto x
 set yrange [0:*]
@@ -98,7 +98,7 @@ def main():
                 ltpt[impl] = (i + 1, i + 1)
                 impls.append(impl)
 
-    # create the count gnuplot graphs
+    # create the count graphs
     for dist in ('inc', 'dec', 'rand'):
         param = {'dist': dist,
                  'distname': {'inc': 'increasing',
@@ -115,6 +115,7 @@ def main():
 
         open('count_%s.p' % dist, 'w').write(COUNT_TEMPLATE % param)
         subprocess.call(["gnuplot", "count_%s.p" % dist])
+        os.unlink('count_%s.p' % dist)
 
     # histogram the comparisons for the largest and smallest number of
     # elements
@@ -146,9 +147,9 @@ def main():
             # write the .dat file
             datf = ''.join('%s %f\n' % (h[0], h[1] / float(unit))
                            for h in hists)
-            open('data/%s_%s.dat' % (f_name, dist), "w").write(datf)
+            open('%s_%s.dat' % (f_name, dist), "w").write(datf)
 
-            # write the gnuplot script
+            # write the gnuplot script and render the png
             distname = {'inc': 'increasing',
                         'dec': 'decreasing',
                         'rand': 'random'}.get(dist, dist)
@@ -158,10 +159,9 @@ def main():
                                        'distname': distname,
                                        'unit': unit_name}
             open('%s_%s.p' % (f_name, dist), "w").write(gplot)
-
-            # and finally create the png
             subprocess.call(["gnuplot", "%s_%s.p" % (f_name, dist)])
-
+            os.unlink('%s_%s.p' % (f_name, dist))
+            os.unlink('%s_%s.dat' % (f_name, dist))
     return 0
 
 if __name__ == "__main__":

@@ -7,14 +7,10 @@ implementations=$(ls -1 impls/qsort_*.c |
                   perl -pe "s/impls\/qsort_(.*)\.c/\1/" |
 		  sort)
 
-# compile comparison counter
+# compile and run them
 for impl in $implementations; do
     gcc -g impls/qsort_$impl.c cmp_count.c -o cmp_$impl
-done
-
-# run comparison counter
-for dist in inc dec rand; do
-    for impl in $implementations; do
+    for dist in inc dec rand; do
 	if [ -e data/${dist}_$impl.dat ]; then
 	    continue
 	fi
@@ -22,9 +18,9 @@ for dist in inc dec rand; do
 	./cmp_${impl} $dist > data/${dist}_$impl.dat || \
             (echo "fail $impl $dist" && rm data/${dist}_$impl.dat)
     done
+    rm cmp_$impl
 done
 
-# graph the comparison count data
-# (mangling the data was a pain in bash. hence python.)
+# graph the resulting data
+mkdir -p output
 python cmp_count_graphs.py
-rm *.p
