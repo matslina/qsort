@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
   /* generate and print a McIlroy killer adversary */
   worst = antiqsort(nmemb);
   for (i=0; i<nmemb; i++)
-    printf("%d%c", worst[i], i==nmemb-1 ? '\n' : ' ');
+    printf("%d\n", worst[i]);
 
   /* qsort() the killer adversary and count comparisons */
   qsort(worst, nmemb, sizeof(int), cmp_int);
