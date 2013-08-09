@@ -90,12 +90,23 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  /* generate and print a McIlroy killer adversary */
+  /* generate a McIlroy killer adversary */
   worst = antiqsort(nmemb);
+#ifdef DUMPDIST
   for (i=0; i<nmemb; i++)
     printf("%d\n", worst[i]);
+  return 0;
+#endif
 
   /* qsort() the killer adversary and count comparisons */
+  printf("%d ", nmemb);
+  qsort(worst, nmemb, sizeof(int), cmp_int);
+  printf("%d ", count);
+
+  /* qsort() a random distribution for comparison */
+  for (i=0; i<nmemb; i++)
+    worst[i] = rand();
+  count = 0;
   qsort(worst, nmemb, sizeof(int), cmp_int);
   printf("%d\n", count);
 
