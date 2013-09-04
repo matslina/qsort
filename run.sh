@@ -44,7 +44,7 @@ gcc bsdkiller.c impls/qsort_freebsd-8.1.0.c -o dist_anti_freebsd-8.1.0 -DDUMPDIS
 for impl in $impls; do
 
     # plot 64 entry killer adversary
-    ./dist_anti_$impl 64 | tail -n+2 > data/dist_anti_$impl.dat
+    ./dist_anti_$impl 64 > data/dist_anti_$impl.dat
     cat > dist_anti_$impl.p <<EOF
 set terminal png
 set output "output/anti_$impl.png"
@@ -91,4 +91,5 @@ plot 'data/anti_$impl.dat' using 1:2 title "killer input" with linespoints linec
 
 EOF
     gnuplot anti_$impl.p
+    rm anti_$impl.p
 done
