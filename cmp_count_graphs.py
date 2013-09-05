@@ -47,7 +47,7 @@ set grid y
 set xtic rotate by -45 scale 0
 set boxwidth 0.9
 set ylabel "%(unit)s comparisons"
-plot 'data/%(minmax)s_%(dist)s.dat' using 2:xticlabel(1) notitle
+plot '%(minmax)s_%(dist)s.dat' using 2:xticlabel(1) notitle
 """
 
 
