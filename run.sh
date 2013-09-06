@@ -32,7 +32,6 @@ impls=$(ls -1 impls/*sort_*.c |
 
 # compile antiqsort for all implementations, bsdkiller for freebsd
 for impl in $impls; do
-    echo impls/*sort_$impl.c
     gcc antiqsort.c impls/*sort_$impl.c -o anti_$impl
     gcc antiqsort.c impls/*sort_$impl.c -o dist_anti_$impl -DDUMPDIST
 done
@@ -40,11 +39,36 @@ echo impls/qsort_freebsd-8.1.0.c
 gcc bsdkiller.c impls/qsort_freebsd-8.1.0.c -o anti_freebsd-8.1.0
 gcc bsdkiller.c impls/qsort_freebsd-8.1.0.c -o dist_anti_freebsd-8.1.0 -DDUMPDIST
 
-# run and plot
+# run and dump data
 for impl in $impls; do
 
-    # plot 64 entry killer adversary
-    ./dist_anti_$impl 64 > data/dist_anti_$impl.dat
+    # 64 entry killer adversary
+    if [ ! -e data/dist_anti_$impl.dat ]; then
+	./dist_anti_$impl 64 > data/dist_anti_$impl.dat
+    fi
+    rm dist_anti_$impl
+
+    # count comparisons for several input sizes
+    if [ ! -e data/anti_$impl.dat ]; then
+	> data/anti_$impl.dat
+	for nmemb in $(seq 64 64 1024); do
+	    ./anti_$impl $nmemb >> data/anti_$impl.dat
+	done
+    fi
+
+    # and for a large input
+    if [ ! -e data/large_anti_$impl.dat ]; then
+	./anti_$impl 65536 > data/large_anti_$impl.dat
+    fi
+    rm anti_$impl
+
+done
+
+# process data
+antidata=$(ls -1 data/anti_large_*.dat | perl -pe 's/^data\/anti_large_(.*)\.dat$/\1/')
+for impl in $antidata; do
+
+    # plot 64 dist
     cat > dist_anti_$impl.p <<EOF
 set terminal png
 set output "output/anti_$impl.png"
@@ -64,14 +88,6 @@ plot 'data/dist_anti_$impl.dat' using 1 with boxes notitle linecolor rgb "black"
 EOF
     gnuplot dist_anti_$impl.p
     rm dist_anti_$impl.p
-    rm dist_anti_$impl
-
-    # count comparisons for several input sizes
-    > data/anti_$impl.dat
-    for nmemb in $(seq 64 64 1024); do
-	./anti_$impl $nmemb >> data/anti_$impl.dat
-    done
-    rm anti_$impl
 
     # plot as lines
     cat > anti_$impl.p <<EOF
@@ -92,4 +108,28 @@ plot 'data/anti_$impl.dat' using 1:2 title "killer input" with linespoints linec
 EOF
     gnuplot anti_$impl.p
     rm anti_$impl.p
+
+    # and aggregate the large results
+    echo -ne "$impl " >> large_anti.dat
+    cat data/large_anti_$impl.dat >> large_anti.dat
 done
+
+# plot the large input results
+cat > large_anti.p <<EOF
+set terminal png
+set output "output/anti_large.png"
+set style data histograms
+set style histogram gap 1
+set boxwidth 1 relative
+set style fill solid 1.0 border -1
+set yrange [0:*]
+set xtic rotate by -45 scale 0
+set grid y
+set ylabel "comparisons"
+plot 'large_anti.dat' using (\$3/\$4):xticlabels(1) t "bar"
+EOF
+sort large_anti.dat -k4 > fnord
+mv fnord large_anti.dat
+gnuplot large_anti.p
+rm large_anti.p
+rm large_anti.dat
