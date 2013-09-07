@@ -72,7 +72,7 @@ for impl in $antidata; do
     cat > dist_anti_$impl.p <<EOF
 set terminal png
 set output "output/anti_$impl.png"
-set title "$impl sort killer input"
+set title "$impl qsort() killer input"
 set style data histogram
 set style fill solid
 set xrange [-0.5:63.5]
