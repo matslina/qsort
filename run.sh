@@ -133,3 +133,14 @@ mv fnord large_anti.dat
 gnuplot large_anti.p
 rm large_anti.p
 rm large_anti.dat
+
+# compose a matrix of a few of the quicksorts
+quicksorts="illumos plan9 glibc.*quick"
+imgs=""
+for quicksort in $quicksorts; do
+    imgs="$imgs $(find output -name anti_\*.png | egrep $quicksort.*\\.png\$ | grep -v lines)"
+    imgs="$imgs $(find output -name anti_lines\*.png | egrep $quicksort.*\\.png\$)"
+    echo $imgs
+done
+
+montage $imgs -geometry 320x240 -tile 2 output/anti_montage.png
