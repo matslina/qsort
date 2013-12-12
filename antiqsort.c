@@ -3,42 +3,34 @@
 #include <limits.h>
 
 
-
 /***********************
  * McIlroy's antiqsort *
  ***********************/
-#define IS_GAS(i) (data[i] == gas)
-#define IS_SOLID(i) (!IS_GAS(i))
-#define FREEZE(i) data[i] = frozen++
 int frozen = 1;
 int gas;
 int *data;
 
 int antiqsort_cmp(const void *ap, const void *bp) {
   int a, b;
-  static int candidate;
+  static int candidate = 0;
 
   a = *(int *)ap;
   b = *(int *)bp;
 
-  if (IS_SOLID(a) && IS_GAS(b)) {
-    candidate = b;
-    return -1;
-  }
+  if (data[a] == gas && data[b] == gas)
+    if (a == candidate)
+      data[a] = frozen++;
+    else
+      data[b] = frozen++;
 
-  if (IS_GAS(a) && IS_SOLID(b)) {
+  if (data[a] == gas) {
     candidate = a;
     return 1;
   }
 
-  if (IS_GAS(a) && IS_GAS(b)) {
-    if (a == candidate) {
-      FREEZE(a);
-      return -1;
-    } else {
-      FREEZE(b);
-      return 1;
-    }
+  if (data[b] == gas) {
+    candidate = b;
+    return -1;
   }
 
   return data[a] - data[b];
@@ -97,6 +89,7 @@ int main(int argc, char *argv[]) {
     printf("%d\n", worst[i]);
   return 0;
 #endif
+
 
   /* qsort() the killer adversary and count comparisons */
   printf("%d ", nmemb);
