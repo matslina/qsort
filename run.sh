@@ -65,7 +65,7 @@ for impl in $impls; do
 done
 
 # process data
-antidata=$(ls -1 data/anti_large_*.dat | perl -pe 's/^data\/anti_large_(.*)\.dat$/\1/')
+antidata=$(ls -1 data/large_anti_*.dat | perl -pe 's/^data\/large_anti_(.*)\.dat$/\1/')
 for impl in $antidata; do
 
     # plot 64 dist
@@ -118,6 +118,7 @@ done
 cat > large_anti.p <<EOF
 set terminal png
 set output "output/anti_large.png"
+set title "performance drop on 2^16 killer input"
 set style data histograms
 set style histogram gap 1
 set boxwidth 1 relative
@@ -125,8 +126,8 @@ set style fill solid 1.0 border -1
 set yrange [0:*]
 set xtic rotate by -45 scale 0
 set grid y
-set ylabel "comparisons"
-plot 'large_anti.dat' using (\$3/\$4):xticlabels(1) t "bar"
+set ylabel "factor"
+plot 'large_anti.dat' using (\$3/\$4):xticlabels(1) t ""
 EOF
 sort large_anti.dat -k4 > fnord
 mv fnord large_anti.dat
