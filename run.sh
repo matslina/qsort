@@ -55,17 +55,11 @@ for impl in $impls; do
 	    ./anti_$impl $nmemb >> data/anti_$impl.dat
 	done
     fi
-
-    # and for a large input
-    if [ ! -e data/large_anti_$impl.dat ]; then
-	./anti_$impl 65536 > data/large_anti_$impl.dat
-    fi
-    rm anti_$impl
-
 done
 
 # process data
-antidata=$(ls -1 data/large_anti_*.dat | perl -pe 's/^data\/large_anti_(.*)\.dat$/\1/')
+antidata=$(ls -1 data/anti_*.dat | perl -pe 's/^data\/anti_(.*)\.dat$/\1/')
+echo antidata $antidata
 for impl in $antidata; do
 
     # plot 64 dist
@@ -109,31 +103,7 @@ EOF
     gnuplot anti_$impl.p
     rm anti_$impl.p
 
-    # and aggregate the large results
-    echo -ne "$impl " >> large_anti.dat
-    cat data/large_anti_$impl.dat >> large_anti.dat
 done
-
-# plot the large input results
-cat > large_anti.p <<EOF
-set terminal png
-set output "output/anti_large.png"
-set title "performance drop on 2^16 killer input"
-set style data histograms
-set style histogram gap 1
-set boxwidth 1 relative
-set style fill solid 1.0 border -1
-set yrange [0:*]
-set xtic rotate by -45 scale 0
-set grid y
-set ylabel "factor"
-plot 'large_anti.dat' using (\$3/\$4):xticlabels(1) t ""
-EOF
-sort large_anti.dat -k4 > fnord
-mv fnord large_anti.dat
-gnuplot large_anti.p
-rm large_anti.p
-rm large_anti.dat
 
 # compose a matrix of a few of the quicksorts
 quicksorts="illumos plan9 glibc.*quick"
